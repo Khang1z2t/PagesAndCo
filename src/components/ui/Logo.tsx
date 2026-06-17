@@ -14,11 +14,11 @@ export function Logo({ variant = 'dark', textColor, showText = true }: LogoProps
         className="w-9 h-9 rounded-full flex items-center justify-center shrink-0"
         style={{ backgroundColor: circleColor }}
       >
-        <span className="text-white font-serif font-bold text-lg">P</span>
+        <span className="text-white font-bold text-lg">P</span>
       </div>
       {showText && (
         <span
-          className="font-serif font-bold text-xl"
+          className="font-bold text-xl"
           style={{ color: textColor ?? defaultText }}
         >
           Pages &amp; Co.
