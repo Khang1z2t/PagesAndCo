@@ -1,10 +1,22 @@
 "use client";
 
 import Link from "next/link";
+import { toast } from "sonner";
 import { Badge } from "@/components/ui/Badge";
 import { useAuthStore } from "@/store/useAuthStore";
 import { useCartStore } from "@/store/useCartStore";
 import type { Book } from "@/types";
+
+function showAddToBagToast(book: Book) {
+  toast.success("Added to bag", {
+    description: `${book.title} is waiting in your bag.`,
+  });
+}
+
+function handleAddToBag(book: Book, addItem: (book: Book) => void) {
+  addItem(book);
+  showAddToBagToast(book);
+}
 
 interface BookDetailProps {
   book: Book;
@@ -27,7 +39,7 @@ export function BookDetail({ book }: BookDetailProps) {
   const openLoginModal = useAuthStore((state) => state.openLoginModal);
 
   return (
-    <section className="pt-8 sm:pt-10">
+    <section className="pt-4 sm:pt-5">
       <div className="page-shell space-y-8">
         <div className="space-y-5">
           <nav className="flex flex-wrap items-center gap-2 text-sm text-[var(--color-muted)]" aria-label="Breadcrumb">
@@ -116,7 +128,7 @@ export function BookDetail({ book }: BookDetailProps) {
                 <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
                   <button
                     type="button"
-                    onClick={() => addItem(book)}
+                    onClick={() => handleAddToBag(book, addItem)}
                     className="inline-flex min-h-12 flex-1 items-center justify-center rounded-full bg-[var(--color-crimson)] px-5 text-sm font-semibold text-white transition hover:brightness-95"
                   >
                     Add to bag

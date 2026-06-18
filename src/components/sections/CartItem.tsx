@@ -71,12 +71,12 @@ export function CartItem({ book, quantity, onIncrease, onDecrease, onRemove }: C
             </div>
           </div>
 
-          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex flex-wrap items-center justify-between gap-3">
             <QuantityStepper quantity={quantity} onDecrease={onDecrease} onIncrease={onIncrease} />
             <button
               type="button"
               onClick={onRemove}
-              className="inline-flex min-h-11 items-center justify-center rounded-full border border-black/10 px-4 text-sm font-semibold text-[var(--color-charcoal)] transition hover:border-[var(--color-gold)] hover:bg-white/70"
+              className="inline-flex min-h-11 shrink-0 items-center justify-center rounded-full border border-black/10 px-4 text-sm font-semibold text-[var(--color-charcoal)] transition hover:border-[var(--color-gold)] hover:bg-white/70"
             >
               Remove
             </button>

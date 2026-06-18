@@ -93,7 +93,7 @@ export default async function BooksPage({ searchParams }: BooksPageProps) {
   const activeGenreName = activeGenreRecord?.name;
 
   return (
-    <section className="pt-8 pb-[var(--section-gap)] sm:pt-10">
+    <section className="pt-4 pb-[var(--section-gap)] sm:pt-5">
       <div className="page-shell space-y-8">
         <div className="space-y-5">
           <nav className="flex items-center gap-2 text-sm text-[var(--color-muted)]" aria-label="Breadcrumb">

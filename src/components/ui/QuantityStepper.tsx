@@ -6,7 +6,7 @@ interface QuantityStepperProps {
 
 export function QuantityStepper({ quantity, onDecrease, onIncrease }: QuantityStepperProps) {
   return (
-    <div className="inline-flex items-center rounded-full border border-black/10 bg-[#F8F2E6] p-1 shadow-sm">
+    <div className="inline-flex w-fit shrink-0 items-center rounded-full border border-black/10 bg-[#F8F2E6] p-1 shadow-sm">
       <button
         type="button"
         onClick={onDecrease}
