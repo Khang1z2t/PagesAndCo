@@ -12,6 +12,8 @@ export default function Navbar() {
   const pathname = usePathname();
   const openLoginModal = useAuthStore((state) => state.openLoginModal);
   const totalItems = useCartStore((state) => state.totalItems);
+  const hasHydrated = useCartStore((state) => state.hasHydrated);
+  const displayTotalItems = hasHydrated ? totalItems : 0;
 
   return (
     <header className="sticky top-0 z-40 border-b border-black/8 bg-[#F4EDDD]/95 backdrop-blur">
@@ -78,12 +80,12 @@ export default function Navbar() {
 
             <Link
               href="/bag"
-              aria-label={`Shopping bag with ${totalItems} item${totalItems === 1 ? "" : "s"}`}
+              aria-label={`Shopping bag with ${displayTotalItems} item${displayTotalItems === 1 ? "" : "s"}`}
               className="inline-flex h-11 shrink-0 items-center gap-2 rounded-full bg-[var(--color-charcoal)] px-4 text-sm font-medium text-white transition hover:bg-black"
             >
               <span className="text-white">Bag</span>
               <span className="inline-flex min-w-7 items-center justify-center rounded-full bg-[var(--color-gold)] px-2 py-1 text-xs font-semibold text-[var(--color-charcoal)]">
-                {totalItems}
+                {displayTotalItems}
               </span>
             </Link>
           </div>

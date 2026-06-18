@@ -4,6 +4,7 @@ export const SITE_NAME = "Pages & Co";
 export const SITE_DESCRIPTION =
   "An independent bookshop for readers who like to take their time.";
 export const FREE_SHIPPING_THRESHOLD = 35;
+export const SHIPPING_FEE = 4.99;
 
 export const NAV_LINKS: NavLink[] = [
   { label: "Home", href: "/" },
