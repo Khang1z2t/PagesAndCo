@@ -24,8 +24,8 @@ export default function Home() {
       <HeroBanner slides={heroSlides} />
       <GenreGrid genres={homeGenres} />
       <BookSection
-        eyebrow="Featured this month"
-        title="Books the shop is talking about."
+        eyebrow="Editor's picks"
+        title="Featured this month"
         href="/books?sort=featured"
         books={featuredBooks}
       />
