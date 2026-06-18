@@ -8,6 +8,7 @@ import type { Book, BookSortValue, Genre } from "@/types";
 
 type BooksPageSearchParams = Promise<{
   genre?: string | string[];
+  query?: string | string[];
   sort?: string | string[];
 }>;
 
@@ -39,6 +40,16 @@ function getActiveSort(value: string | undefined): BookSortValue {
   }
 
   return "featured";
+}
+
+function getActiveQuery(value: string | undefined) {
+  return value?.trim() ?? "";
+}
+
+function matchesBookQuery(book: Book, query: string) {
+  const normalizedQuery = query.toLocaleLowerCase();
+
+  return [book.title, book.author].some((field) => field.toLocaleLowerCase().includes(normalizedQuery));
 }
 
 function sortBooks(collection: Book[], sort: BookSortValue) {
@@ -80,17 +91,32 @@ function sortBooks(collection: Book[], sort: BookSortValue) {
 export default async function BooksPage({ searchParams }: BooksPageProps) {
   const resolvedSearchParams = await searchParams;
   const requestedGenre = getSingleValue(resolvedSearchParams.genre);
+  const requestedQuery = getSingleValue(resolvedSearchParams.query);
   const requestedSort = getSingleValue(resolvedSearchParams.sort);
 
   const activeGenre = getActiveGenre(requestedGenre, genres);
+  const activeQuery = getActiveQuery(requestedQuery);
   const activeSort = getActiveSort(requestedSort);
   const activeGenreRecord = genres.find((genre) => genre.slug === activeGenre);
 
-  const filteredBooks = activeGenreRecord
-    ? books.filter((book) => book.genre === activeGenreRecord.name)
-    : books;
+  const booksByGenre = activeGenreRecord ? books.filter((book) => book.genre === activeGenreRecord.name) : books;
+  const filteredBooks = activeQuery ? booksByGenre.filter((book) => matchesBookQuery(book, activeQuery)) : booksByGenre;
   const sortedBooks = sortBooks(filteredBooks, activeSort);
   const activeGenreName = activeGenreRecord?.name;
+  const resultLabel = activeQuery ? `Results for “${activeQuery}”` : null;
+
+  const clearSearchParams = new URLSearchParams();
+
+  if (activeGenre) {
+    clearSearchParams.set("genre", activeGenre);
+  }
+
+  if (activeSort !== "featured") {
+    clearSearchParams.set("sort", activeSort);
+  }
+
+  const clearSearchHref = clearSearchParams.size > 0 ? `/books?${clearSearchParams.toString()}` : "/books";
+  const browseAllHref = activeSort === "featured" ? "/books" : `/books?sort=${activeSort}`;
 
   return (
     <section className="pt-4 pb-[var(--section-gap)] sm:pt-5">
@@ -109,15 +135,34 @@ export default async function BooksPage({ searchParams }: BooksPageProps) {
             <h1 className="section-heading text-[var(--color-charcoal)]">
               {activeGenreName ? `${activeGenreName} books` : "All books"}
             </h1>
-            <p className="text-base text-[var(--color-muted)] sm:text-lg">
-              {sortedBooks.length} {sortedBooks.length === 1 ? "title" : "titles"} in the collection
-            </p>
+            <div className="space-y-2">
+              <p className="text-base text-[var(--color-muted)] sm:text-lg">
+                {sortedBooks.length} {sortedBooks.length === 1 ? "title" : "titles"} in the collection
+              </p>
+              {resultLabel ? (
+                <div className="flex flex-wrap items-center gap-3 text-sm text-[var(--color-charcoal)] sm:text-base">
+                  <span>{resultLabel}</span>
+                  <Link
+                    href={clearSearchHref}
+                    className="inline-flex items-center rounded-full border border-black/10 bg-white px-3 py-1.5 text-sm font-semibold text-[var(--color-charcoal)] transition hover:border-[var(--color-gold)] hover:bg-white/80"
+                  >
+                    Clear search
+                  </Link>
+                </div>
+              ) : null}
+            </div>
           </div>
         </div>
 
-        <BookFilters genres={genres} sortOptions={SORT_OPTIONS} activeGenre={activeGenre} activeSort={activeSort} />
+        <BookFilters
+          genres={genres}
+          sortOptions={SORT_OPTIONS}
+          activeGenre={activeGenre}
+          activeSort={activeSort}
+          activeQuery={activeQuery}
+        />
 
-        <BookGrid books={sortedBooks} />
+        <BookGrid books={sortedBooks} clearHref={activeQuery ? browseAllHref : clearSearchHref} hasSearchQuery={Boolean(activeQuery)} />
       </div>
     </section>
   );

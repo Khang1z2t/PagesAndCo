@@ -10,9 +10,10 @@ interface BookFiltersProps {
   sortOptions: SortOption[];
   activeGenre?: string;
   activeSort: BookSortValue;
+  activeQuery?: string;
 }
 
-export function BookFilters({ genres, sortOptions, activeGenre, activeSort }: BookFiltersProps) {
+export function BookFilters({ genres, sortOptions, activeGenre, activeSort, activeQuery }: BookFiltersProps) {
   const router = useRouter();
   const pathname = usePathname();
   const sortMenuRef = useRef<HTMLDivElement>(null);
@@ -47,6 +48,10 @@ export function BookFilters({ genres, sortOptions, activeGenre, activeSort }: Bo
 
     if (nextGenre) {
       params.set("genre", nextGenre);
+    }
+
+    if (activeQuery) {
+      params.set("query", activeQuery);
     }
 
     if (nextSort !== "featured") {

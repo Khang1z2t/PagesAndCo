@@ -1,8 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { Suspense, useEffect, useRef } from "react";
-import { usePathname, useSearchParams } from "next/navigation";
+import { type FormEvent, Suspense, useEffect, useRef } from "react";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { Logo } from "@/components/ui/Logo";
 import { NAV_LINKS } from "@/lib/constants";
 import { cn } from "@/lib/utils";
@@ -10,6 +10,7 @@ import { useAuthStore } from "@/store/useAuthStore";
 import { useCartStore } from "@/store/useCartStore";
 
 function NavbarInner() {
+  const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const search = searchParams.toString();
@@ -18,6 +19,7 @@ function NavbarInner() {
   const totalItems = useCartStore((state) => state.totalItems);
   const hasHydrated = useCartStore((state) => state.hasHydrated);
   const displayTotalItems = hasHydrated ? totalItems : 0;
+  const activeQuery = searchParams.get("query")?.trim() ?? "";
 
   useEffect(() => {
     if (!hasMountedRef.current) {
@@ -27,6 +29,29 @@ function NavbarInner() {
 
     window.scrollTo({ top: 0, left: 0, behavior: "auto" });
   }, [pathname, search]);
+
+  function handleSearchSubmit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+
+    const formData = new FormData(event.currentTarget);
+    const trimmedQuery = String(formData.get("query") ?? "").trim();
+    const params = new URLSearchParams();
+
+    if (trimmedQuery) {
+      params.set("query", trimmedQuery);
+    }
+
+    if (pathname === "/books") {
+      const activeSort = searchParams.get("sort");
+
+      if (activeSort) {
+        params.set("sort", activeSort);
+      }
+    }
+
+    const nextSearch = params.toString();
+    router.push(nextSearch ? `/books?${nextSearch}` : "/books");
+  }
 
   return (
     <header className="sticky top-0 z-40 border-b border-black/8 bg-[#F4EDDD]/95 backdrop-blur">
@@ -55,24 +80,40 @@ function NavbarInner() {
             </span>
           </Link>
 
-          <label className="col-span-3 flex h-11 min-w-0 items-center gap-3 rounded-full border border-black/10 bg-white/80 px-4 text-sm text-[var(--color-muted)] shadow-sm lg:col-span-1 lg:col-start-3 lg:row-start-1 lg:w-full">
-            <svg
-              aria-hidden="true"
-              viewBox="0 0 20 20"
-              className="h-4 w-4 shrink-0 text-[var(--color-muted)]"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="1.8"
-            >
-              <path d="M8.5 15a6.5 6.5 0 1 1 0-13 6.5 6.5 0 0 1 0 13Z" />
-              <path d="m13.5 13.5 4 4" />
-            </svg>
+          <form
+            key={`${pathname}:${activeQuery}`}
+            onSubmit={handleSearchSubmit}
+            className="col-span-3 flex h-11 min-w-0 items-center gap-3 rounded-full border border-black/10 bg-white/80 px-4 text-sm text-[var(--color-muted)] shadow-sm lg:col-span-1 lg:col-start-3 lg:row-start-1 lg:w-full"
+          >
+            <label htmlFor="navbar-search" className="sr-only">
+              Search titles and authors
+            </label>
             <input
+              id="navbar-search"
+              name="query"
               type="search"
+              defaultValue={activeQuery}
               placeholder="Search titles, authors..."
               className="w-full min-w-0 border-0 bg-transparent p-0 text-sm text-[var(--color-text)] placeholder:text-[var(--color-muted)] outline-none"
             />
-          </label>
+            <button
+              type="submit"
+              aria-label="Search books"
+              className="inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-[var(--color-muted)] transition hover:text-[var(--color-charcoal)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-gold)]"
+            >
+              <svg
+                aria-hidden="true"
+                viewBox="0 0 20 20"
+                className="h-4 w-4"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1.8"
+              >
+                <path d="M8.5 15a6.5 6.5 0 1 1 0-13 6.5 6.5 0 0 1 0 13Z" />
+                <path d="m13.5 13.5 4 4" />
+              </svg>
+            </button>
+          </form>
 
           <nav
             aria-label="Primary"
@@ -81,8 +122,7 @@ function NavbarInner() {
             <ul className="flex flex-wrap items-center justify-center gap-x-1 gap-y-1">
               {NAV_LINKS.map((link) => {
                 const hrefPath = link.href.split("?")[0];
-                const isActive =
-                  hrefPath === "/" ? pathname === "/" : pathname.startsWith(hrefPath);
+                const isActive = hrefPath === "/" ? pathname === "/" : pathname.startsWith(hrefPath);
 
                 return (
                   <li key={link.href}>
