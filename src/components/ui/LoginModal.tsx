@@ -6,7 +6,10 @@ import { Logo } from "./Logo";
 
 export default function LoginModal() {
   const isLoginModalOpen = useAuthStore((state) => state.isLoginModalOpen);
+  const authModalView = useAuthStore((state) => state.authModalView);
   const closeLoginModal = useAuthStore((state) => state.closeLoginModal);
+  const setAuthModalView = useAuthStore((state) => state.setAuthModalView);
+  const isRegisterView = authModalView === "register";
 
   useEffect(() => {
     if (!isLoginModalOpen) {
@@ -32,16 +35,16 @@ export default function LoginModal() {
       className="fixed inset-0 z-50 flex items-center justify-center bg-black/45 px-4 py-8 backdrop-blur-sm"
       role="dialog"
       aria-modal="true"
-      aria-labelledby="login-modal-title"
+      aria-labelledby="auth-modal-title"
       onClick={closeLoginModal}
     >
       <div
-        className="relative w-full max-w-md rounded-[2rem] bg-[var(--color-cream)] p-6 shadow-[0_28px_90px_rgba(0,0,0,0.24)] sm:p-8"
+        className="relative w-full max-w-md rounded-md bg-[var(--color-cream)] p-6 shadow-[0_28px_90px_rgba(0,0,0,0.24)] sm:p-8"
         onClick={(event) => event.stopPropagation()}
       >
         <button
           type="button"
-          aria-label="Close login modal"
+          aria-label="Close auth modal"
           onClick={closeLoginModal}
           className="absolute right-6 top-6 inline-flex h-10 w-10 items-center justify-center rounded-full border border-black/10 text-[var(--color-charcoal)] transition hover:bg-black/5 sm:right-8 sm:top-8"
         >
@@ -62,13 +65,15 @@ export default function LoginModal() {
           <Logo showText={false} />
           <div className="mt-6">
             <h2
-              id="login-modal-title"
+              id="auth-modal-title"
               className="text-2xl font-semibold tracking-[-0.04em] text-[var(--color-charcoal)]"
             >
-              Welcome back
+              {isRegisterView ? "Create your account" : "Welcome back"}
             </h2>
             <p className="mt-2 text-sm leading-6 text-[var(--color-muted)]">
-              Sign in to access your bag, orders and wishlist.
+              {isRegisterView
+                ? "Create an account to save your bag, track future orders, and keep a wishlist."
+                : "Sign in to access your bag, orders and wishlist."}
             </p>
           </div>
         </div>
@@ -80,6 +85,19 @@ export default function LoginModal() {
             closeLoginModal();
           }}
         >
+          {isRegisterView ? (
+            <label className="block space-y-2">
+              <span className="text-xs font-semibold uppercase tracking-[0.22em] text-[var(--color-muted)]">
+                Name
+              </span>
+              <input
+                type="text"
+                placeholder="Your name"
+                className="min-h-12 w-full rounded-md border border-black/10 bg-white px-4 text-sm text-[var(--color-text)] placeholder:text-[var(--color-muted)] outline-none"
+              />
+            </label>
+          ) : null}
+
           <label className="block space-y-2">
             <span className="text-xs font-semibold uppercase tracking-[0.22em] text-[var(--color-muted)]">
               Email
@@ -100,21 +118,36 @@ export default function LoginModal() {
               className="min-h-12 w-full rounded-md border border-black/10 bg-white px-4 text-sm text-[var(--color-text)] placeholder:text-[var(--color-muted)] outline-none"
             />
           </label>
+
+          {isRegisterView ? (
+            <label className="block space-y-2">
+              <span className="text-xs font-semibold uppercase tracking-[0.22em] text-[var(--color-muted)]">
+                Confirm password
+              </span>
+              <input
+                type="password"
+                placeholder="••••••••"
+                className="min-h-12 w-full rounded-md border border-black/10 bg-white px-4 text-sm text-[var(--color-text)] placeholder:text-[var(--color-muted)] outline-none"
+              />
+            </label>
+          ) : null}
+
           <button
             type="submit"
             className="inline-flex min-h-12 w-full items-center justify-center rounded-full bg-[var(--color-crimson)] px-5 text-sm font-semibold text-white transition hover:brightness-105"
           >
-            Sign in
+            {isRegisterView ? "Create account" : "Sign in"}
           </button>
         </form>
 
         <p className="mt-6 text-center text-sm text-[var(--color-muted)]">
-          New here?{" "}
+          {isRegisterView ? "Already have an account? " : "New here? "}
           <button
             type="button"
+            onClick={() => setAuthModalView(isRegisterView ? "sign-in" : "register")}
             className="font-medium text-[var(--color-crimson)] underline underline-offset-4"
           >
-            Create an account
+            {isRegisterView ? "Sign in" : "Create an account"}
           </button>
         </p>
       </div>
