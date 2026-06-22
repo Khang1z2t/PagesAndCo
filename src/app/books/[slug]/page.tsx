@@ -28,6 +28,10 @@ function getRelatedBooks(slug: string, genre: string) {
   return [...sameGenre, ...curatedFallback.filter((book) => !sameGenre.some((entry) => entry.id === book.id))].slice(0, 4);
 }
 
+export function generateStaticParams() {
+  return books.map((book) => ({ slug: book.slug }));
+}
+
 export async function generateMetadata({ params }: BookPageProps): Promise<Metadata> {
   const { slug } = await params;
   const book = getBookBySlug(slug);
